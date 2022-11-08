@@ -26,8 +26,13 @@ run();
 const servicesCollection=client.db("creativephotography").collection("services")
 
 
-app.post('/services', async (req, res) => {
-    const info = req.body;
-    const result = servicesCollection.insertOne(info);
+app.get('/services', async (req, res) => {
+    const cursor = servicesCollection.find({});
+    const result = await cursor.limit(3).toArray();
+    res.send(result)
+})
+app.get('/allservices', async (req, res) => {
+    const cursor = servicesCollection.find({});
+    const result = await cursor.toArray();
     res.send(result)
 })
