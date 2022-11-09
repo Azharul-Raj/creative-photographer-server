@@ -21,7 +21,7 @@ const verifyJWT = (req,res,next) => {
     if (!authHeader) {
         return res.status(401).send('Unauthorized User')
     }
-    const token = req.headers.authorization;
+    const token = req.headers.authorization.split(' ')[1]
     jwt.verify(token, process.env.SECRET_KEY, (err,decoded) => {
         if (err) {
             console.log(err);
@@ -61,7 +61,7 @@ app.get('/service/:id', async (req, res) => {
     res.send(result);
 })
 // review posting part here
-app.post('/services', async (req, res) => {
+app.post('/services',verifyJWT, async (req, res) => {
     const service = req.body;
     const result = await servicesCollection.insertOne(service);
     res.send(result)
@@ -82,7 +82,7 @@ app.get('/reviews/:id', async (req, res) => {
     res.send(result);
 })
 // get data by email
-app.get('/reviews', async (req, res) => {
+app.get('/reviews',verifyJWT, async (req, res) => {
     const decoded = req.decoded;
     if (decoded.email !== req.query.email) {
         return res.status(403).send('Unauthorize Access');
@@ -98,14 +98,14 @@ app.get('/reviews', async (req, res) => {
     res.send(result);
 })
 // delete method here
-app.delete('/reviews/:id', async (req, res) => {
+app.delete('/reviews/:id',verifyJWT, async (req, res) => {
     const { id } = req.params;
     const query = { _id: ObjectId(id) };
     const result = await reviewsCollection.deleteOne(query);
     res.send(result);
 })
 // update method here
-app.patch('/reviews/:id', async (req, res) => {
+app.patch('/reviews/:id',verifyJWT, async (req, res) => {
     try {
         const { id } = req.params;
     const query = { _id: ObjectId(id) };

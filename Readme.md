@@ -11,6 +11,6 @@
 * JWT is used for authorization
 * .env package is used for hiding secret.
 * Deployed the server side  in vercel
-* 
+ 
 
  
