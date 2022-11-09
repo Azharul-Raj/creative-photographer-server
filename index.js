@@ -3,6 +3,7 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require("cors");
 require('dotenv').config()
 const app = express();
+var jwt = require('jsonwebtoken');
 
 app.use(cors());
 app.use(express.json());
@@ -14,6 +15,22 @@ app.listen(port, () => {
 app.get('/', (req, res) => {
     res.send('Server up and running')
 })
+
+const verifyJWT = (req,res,next) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).send('Unauthorized User')
+    }
+    const token = req.headers.authorization;
+    jwt.verify(token, process.env.SECRET_KEY, (err,decoded) => {
+        if (err) {
+            console.log(err);
+            return res.status(401).send('Invalid Token')
+        }
+        req.decoded = decoded;
+        next();
+    })
+}
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.dnsrj7s.mongodb.net/?retryWrites=true&w=majority`;
@@ -43,7 +60,6 @@ app.get('/service/:id', async (req, res) => {
     const result = await servicesCollection.findOne(query);
     res.send(result);
 })
-// service post part
 // review posting part here
 app.post('/services', async (req, res) => {
     const service = req.body;
@@ -67,6 +83,10 @@ app.get('/reviews/:id', async (req, res) => {
 })
 // get data by email
 app.get('/reviews', async (req, res) => {
+    const decoded = req.decoded;
+    if (decoded.email !== req.query.email) {
+        return res.status(403).send('Unauthorize Access');
+    }
     let query = {}
     if (req.query.email) {
         query = {            
@@ -99,4 +119,10 @@ app.patch('/reviews/:id', async (req, res) => {
     catch (err) {
         console.log(err)
     }
+})
+// jet added 
+app.post('/jwt', (req, res) => {
+    const info = req.body;
+    const token = jwt.sign(info, process.env.SECRET_KEY, { expiresIn: '1h' });
+    res.send({token})
 })
