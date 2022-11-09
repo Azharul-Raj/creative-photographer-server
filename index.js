@@ -47,7 +47,7 @@ app.get('/service/:id', async (req, res) => {
 // review posting part here
 app.post('/services', async (req, res) => {
     const service = req.body;
-    const result = await servicesCollection.insertOne(comment);
+    const result = await servicesCollection.insertOne(service);
     res.send(result)
 })
 
@@ -61,7 +61,7 @@ app.post('/reviews', async (req, res) => {
 app.get('/reviews/:id', async (req, res) => {
     const id = parseInt(req.params.id)
     const query = { service_id: id };
-    const cursor =reviewsCollection.find(query);
+    const cursor =reviewsCollection.find(query).sort({"time":-1});
     const result = await cursor.toArray();
     res.send(result);
 })
@@ -73,7 +73,7 @@ app.get('/reviews', async (req, res) => {
             email: req.query.email
         }
     }
-    const cursor = reviewsCollection.find(query).sort({"time":1})
+    const cursor = reviewsCollection.find(query).sort({"time":-1})
     const result = await cursor.toArray();
     res.send(result);
 })
