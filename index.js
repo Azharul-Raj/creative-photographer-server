@@ -58,3 +58,22 @@ app.get('/reviews/:id', async (req, res) => {
     const result = await cursor.toArray();
     res.send(result);
 })
+// get data by email
+app.get('/reviews', async (req, res) => {
+    let query = {}
+    if (req.query.email) {
+        query = {            
+            email: req.query.email
+        }
+    }
+    const cursor = reviewsCollection.find(query)
+    const result = await cursor.toArray();
+    res.send(result);
+})
+// delete method here
+app.delete('/reviews/:id', async (req, res) => {
+    const { id } = req.params;
+    const query = { _id: ObjectId(id) };
+    const result = await reviewsCollection.deleteOne(query);
+    res.send(result);
+})
