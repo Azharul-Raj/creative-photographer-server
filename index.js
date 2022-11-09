@@ -77,3 +77,14 @@ app.delete('/reviews/:id', async (req, res) => {
     const result = await reviewsCollection.deleteOne(query);
     res.send(result);
 })
+// update method here
+app.patch('/reviews/:id', async (req, res) => {
+    const { id } = req.params;
+    const query = { _id: ObjectId(id) };
+    const comment = req.body;
+    const updatedComment = {
+        $set:{comment:comment}
+    }
+    const result = await reviewsCollection.updateOne(query, updatedComment);
+    res.send(result);
+})
