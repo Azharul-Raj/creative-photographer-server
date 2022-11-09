@@ -43,6 +43,13 @@ app.get('/service/:id', async (req, res) => {
     const result = await servicesCollection.findOne(query);
     res.send(result);
 })
+// service post part
+// review posting part here
+app.post('/services', async (req, res) => {
+    const service = req.body;
+    const result = await servicesCollection.insertOne(comment);
+    res.send(result)
+})
 
 // review posting part here
 app.post('/reviews', async (req, res) => {
@@ -66,7 +73,7 @@ app.get('/reviews', async (req, res) => {
             email: req.query.email
         }
     }
-    const cursor = reviewsCollection.find(query)
+    const cursor = reviewsCollection.find(query).sort({"time":1})
     const result = await cursor.toArray();
     res.send(result);
 })
@@ -79,7 +86,8 @@ app.delete('/reviews/:id', async (req, res) => {
 })
 // update method here
 app.patch('/reviews/:id', async (req, res) => {
-    const { id } = req.params;
+    try {
+        const { id } = req.params;
     const query = { _id: ObjectId(id) };
     const comment = req.body;
     const updatedComment = {
@@ -87,4 +95,8 @@ app.patch('/reviews/:id', async (req, res) => {
     }
     const result = await reviewsCollection.updateOne(query, updatedComment);
     res.send(result);
+    }
+    catch (err) {
+        console.log(err)
+    }
 })
